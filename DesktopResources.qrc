@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/">
+        <file>images/willcode.png</file>
+    </qresource>
+</RCC>
