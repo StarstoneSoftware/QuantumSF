@@ -32,6 +32,11 @@ QuantumGui::QuantumGui(QWidget *parent, QuantumDevice *pDevice) :
     ui->setupUi(this);
     setWindowFlags(Qt::Widget);
 
+    // This displays the wavelength adjustments
+    pWavelengthGraph = new WavelengthGraph(ui->graphFrame);
+    QSize size = ui->graphFrame->frameSize();
+    pWavelengthGraph->setGeometry(0, 0, size.width(), size.height());
+
     // This is how we talk to the quantum.
     pQuantumDevice = pDevice;
 
@@ -45,6 +50,14 @@ QuantumGui::~QuantumGui()
 {
     delete ui;
 }
+
+void QuantumGui::resizeEvent(QResizeEvent *event)
+    {
+    //QSize size = ui->graphFrame->frameSize();
+    //pWavelengthGraph->setGeometry(0, 0, size.width(), size.height());
+
+    event->accept();
+    }
 
 ////////////////////////////////////////////////////////////////////
 /// Increase wingshift by .1 angstroms
@@ -160,7 +173,7 @@ void QuantumGui::updateStatusDisplay(void)
     // Temp
     output = QString::asprintf("Heater temperature: %.1f", deviceStatus.heater1Temprature);
     output += degreeSymbol;
-    output += " F";
+    output += " F ";
     ui->labelTemp->setText(output);
 
     // Boots
@@ -170,6 +183,10 @@ void QuantumGui::updateStatusDisplay(void)
     // Runtime
     //output = QString::asprintf("Run Time: %d minutes", deviceStatus.nRunMinutes);
     //ui->labelRunTime->setText(output);
+    pWavelengthGraph->SetCurrentWavelength(deviceStatus.centerWavelength);
+    pWavelengthGraph->SetDesignWavelength(pQuantumDevice->getWavelengthString().toFloat());
+    pWavelengthGraph->SetCurrentWingshift(deviceStatus.wingShift);
+    pWavelengthGraph->update();
 
     }
 

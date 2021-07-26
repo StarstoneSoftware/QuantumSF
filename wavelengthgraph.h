@@ -20,55 +20,39 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE
+
+This class draws the wavelength graph.
 */
-/* This is the main gui for displaying the Quantum status and sending it
- * commands.
- *
- *
-*/
-#ifndef QUANTUMGUI_H
-#define QUANTUMGUI_H
 
-#include "quantumdevice.h"
-#include "wavelengthgraph.h"
+#ifndef WAVELENGTHGRAPH_H
+#define WAVELENGTHGRAPH_H
 
-#include <QDialog>
-#include <QResizeEvent>
+#include <QWidget>
+#include <QPaintEvent>
 
-
-namespace Ui {
-class QuantumGui;
-}
-
-class QuantumGui : public QDialog
+class WavelengthGraph : public QWidget
 {
     Q_OBJECT
-
 public:
-    explicit QuantumGui(QWidget *parent, QuantumDevice *pDevice);
-    ~QuantumGui();
+    explicit WavelengthGraph(QWidget *parent);
+
+    void SetDesignWavelength(float fCenter)     { fDesignWavelength = fCenter; }
+    void SetCurrentWavelength(float fCurrent)   { fCurrentWavelength = fCurrent; }
+    void SetCurrentWingshift(float fShift)      { fWingshift = fShift; }
+
+protected:
+    float   fDesignWavelength;      // Center wavelength as designed
+    float   fCurrentWavelength;     // Current wavelength
+    float   fWingshift;             // Current wingshift
 
     // Angstrom Symbol
     const unsigned char angstromEncode[4] = { 0xe2, 0x84, 0xab, 0x0 };
     const QString angstromSymbol = QString().fromUtf8((const char *)angstromEncode);
 
-    // Degree Symbol
-    const unsigned char degreeEncode[4] = { 0xc2, 0xb0, 0x0, 0x0 };
-    const QString degreeSymbol = QString().fromUtf8((const char *)degreeEncode);
+    virtual void	paintEvent(QPaintEvent *event);
 
-protected:
-    virtual void resizeEvent(QResizeEvent *event);
+signals:
 
-private:
-    Ui::QuantumGui *ui;
-    QuantumDevice  *pQuantumDevice = nullptr;
-    WavelengthGraph *pWavelengthGraph = nullptr;
-
-public Q_SLOTS:
-    void updateStatusDisplay(void);
-    void pressedUp(void);
-    void pressedDown(void);
-    void pressedCenter(void);
 };
 
-#endif // QUANTUMGUI_H
+#endif // WAVELENGTHGRAPH_H

@@ -6,9 +6,21 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>772</width>
-    <height>531</height>
+    <width>770</width>
+    <height>530</height>
    </rect>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>770</width>
+    <height>530</height>
+   </size>
+  </property>
+  <property name="maximumSize">
+   <size>
+    <width>770</width>
+    <height>530</height>
+   </size>
   </property>
   <property name="windowTitle">
    <string>Quantum Filter Control Center</string>
@@ -19,7 +31,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>772</width>
+     <width>770</width>
      <height>24</height>
     </rect>
    </property>

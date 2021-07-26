@@ -80,9 +80,21 @@ bool QuantumDevice::sendCommand(const char* szCommand)
     if(nTries > 3) return false; // Gave up..
 
     int iIndex = 0;
+    char nextChar = 0x0;
+    //char lastChar = 0x0;
     while(!pSerialPort->atEnd() && iIndex < MAX_COMM_BUFFER_SIZE) {
-        pSerialPort->getChar(szReturnBuffer+iIndex);
+        pSerialPort->getChar(&nextChar);
+        szReturnBuffer[iIndex] = nextChar;
         iIndex++;
+
+        // The docs say \r\n is at the end of response strings, but I have yet
+        // to see this...
+        // signals end
+        //if(nextChar == 0x0a && lastChar == 0x0d)
+        //    break;
+
+        //lastChar = nextChar;
+
         pSerialPort->waitForReadyRead(100);
         }
     szReturnBuffer[iIndex] = 0x0;

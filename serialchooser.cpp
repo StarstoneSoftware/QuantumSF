@@ -79,8 +79,10 @@ void SerialChooser::refreshPortList(void)
     ui->treeWidget->setHeaderLabels(headers);
 
     for(int i = 0; i < listOfPorts.size(); i++) {
-        // On macOS, filter out cu.Bluetooth and other cu. listings.
-        if(listOfPorts[i].portName().contains("cu.")) {
+        // On macOS, filter out tty.Bluetooth and other tty. listings.
+        // CU is for callinging out, tty is for calling in. We are going
+        // out...
+        if(listOfPorts[i].portName().contains("tty.")) {
             listOfPorts.removeAt(i);
             i--;
             continue;

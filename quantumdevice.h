@@ -39,7 +39,7 @@ SOFTWARE
 #define MAX_COMM_BUFFER_SIZE    128
 
 // TIMEOUT value in milliseconds (initially 1 second)
-#define QUANTUM_TIMEOUT 2000
+#define QUANTUM_TIMEOUT 1000
 
 /////////////////////////////////////////////////////////////
 /// Device status, updated by device thread.

@@ -14,14 +14,16 @@ SOURCES += \
     mainwindow.cpp \
     quantumdevice.cpp \
     quantumgui.cpp \
-    serialchooser.cpp
+    serialchooser.cpp \
+    wavelengthgraph.cpp
 
 HEADERS += \
     dlgabout.h \
     mainwindow.h \
     quantumdevice.h \
     quantumgui.h \
-    serialchooser.h
+    serialchooser.h \
+    wavelengthgraph.h
 
 FORMS += \
     dlgabout.ui \
