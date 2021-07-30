@@ -39,7 +39,7 @@ MainWindow::MainWindow(QWidget *parent)
     pSerialChooser = new SerialChooser(this);
     this->setCentralWidget(pSerialChooser);
 
-    connect(pSerialChooser, SIGNAL(connectedToQuantum(QuantumDevice*)), this, SLOT(quantumHasConnected(QuantumDevice*)));
+    connect(pSerialChooser, SIGNAL(connectedToQuantum(QuantumDevice*)), this, SLOT(quantumHasConnected(QuantumDevice*)), Qt::QueuedConnection);
 }
 
 MainWindow::~MainWindow()
@@ -51,8 +51,10 @@ void MainWindow::closeEvent(QCloseEvent *event)
 {
     if(pQuantumDevice) {
         pQuantumDevice->exit();
+        QDeadlineTimer deadline(500);
+        if(!pQuantumDevice->wait(deadline))
+            pQuantumDevice->terminate();
 
-        pQuantumDevice->wait();
         delete pQuantumDevice;
         }
 

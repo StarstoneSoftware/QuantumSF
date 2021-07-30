@@ -41,6 +41,12 @@ const char* qCmdGetDesignWavelength = "GX\n";   // Get Design wavelength
 QuantumDevice::QuantumDevice(QObject *parent, QSerialPortInfo serialPortInformation) : QThread(parent)
 {
     serialPortInfo = serialPortInformation;
+
+    // I know this is frowned on in some circles, but really... I just can't justify writing
+    // a bunch of extra convoluted code when this class "should" simply run the signals/slots
+    // through it's own message pump, especially when the connections are marked as queued.
+    // Fight me...
+    moveToThread(this);
 }
 
 QuantumDevice::~QuantumDevice(void)
@@ -68,6 +74,7 @@ bool QuantumDevice::sendCommand(const char* szCommand)
     int nTries = 0;
     while(nTries++ < 3) {
         pSerialPort->write(szCommand);
+        pSerialPort->flush();
         if(!pSerialPort->waitForBytesWritten())
             return false; // This is an actual error... no retries
 
@@ -79,6 +86,7 @@ bool QuantumDevice::sendCommand(const char* szCommand)
 
     if(nTries > 3) return false; // Gave up..
 
+    pSerialPort->waitForReadyRead(100);
     int iIndex = 0;
     char nextChar = 0x0;
     //char lastChar = 0x0;
@@ -92,10 +100,9 @@ bool QuantumDevice::sendCommand(const char* szCommand)
         // signals end
         //if(nextChar == 0x0a && lastChar == 0x0d)
         //    break;
-
         //lastChar = nextChar;
 
-        pSerialPort->waitForReadyRead(100);
+        pSerialPort->waitForReadyRead(10);
         }
     szReturnBuffer[iIndex] = 0x0;
 
@@ -144,14 +151,18 @@ int QuantumDevice::toSignedInteger(const char* szStringField)
 /// is saying "I told you so"...
 void QuantumDevice::run()
 {
+    // Yes, we can kill you if you misbehave... make another one just like you ;-)
     setTerminationEnabled(true);
 
     //Settings are 9600 baud, 8 bits, no parity, 1 stop bit, with no handshaking.
     pSerialPort = new QSerialPort(serialPortInfo, nullptr);
+
     pSerialPort->setBaudRate(9600);
     pSerialPort->setDataBits(QSerialPort::Data8);
     pSerialPort->setParity(QSerialPort::NoParity);
     pSerialPort->setStopBits(QSerialPort::OneStop);
+    pSerialPort->setFlowControl(QSerialPort::NoFlowControl);
+    pSerialPort->setReadBufferSize(MAX_COMM_BUFFER_SIZE);
 
     // Basic serial port opening, doesn't prove anything yet..
     bool bReady = false;
@@ -160,6 +171,7 @@ void QuantumDevice::run()
             bReady = true;
 
     if(bReady) {
+        //connect(this, SIGNAL(connectedToQuantum(QuantumDevice*)), SLOT(updateStatus()), Qt::QueuedConnection);
         emit connectedToQuantum(this);
         updateStatus();
         }
@@ -250,8 +262,6 @@ bool QuantumDevice::getStaticInfoFromDevice(void)
 ///
 void QuantumDevice::parseStatusInfo()
 {
-    mutexBlocker.lock();
-
     // NO... use the GA command to get the body style
     // Count the number of spaces so we now if we have two heaters or one
     int nSpaces = 0;
@@ -260,7 +270,7 @@ void QuantumDevice::parseStatusInfo()
         if(szReturnBuffer[i] == 32)
             nSpaces++;
 
-    deviceStatus.bDualHeaters = (nSpaces > 11);
+    _deviceStatus.bDualHeaters = (nSpaces > 11);
 
     // First field is firmware, we already have that
     char *nextField = strtok(szReturnBuffer, " ");
@@ -268,21 +278,21 @@ void QuantumDevice::parseStatusInfo()
 
     // Next field is the error code
     nextField = strtok(NULL, " ");
-    deviceStatus.nErrorCode = toInteger(nextField);
+    _deviceStatus.nErrorCode = toInteger(nextField);
 
     // Next field is on band indication
     nextField = strtok(NULL, " ");
-    deviceStatus.bOnBand = (toInteger(nextField) == 1);
+    _deviceStatus.bOnBand = (toInteger(nextField) == 1);
 
     // Current wavelength
     nextField = strtok(NULL, " ");
     int currWavelength = toInteger(nextField);
-    deviceStatus.centerWavelength = float(currWavelength) * 0.1f;
+    _deviceStatus.centerWavelength = float(currWavelength) * 0.1f;
 
     // Wingshift
     nextField = strtok(NULL, " ");
     int currWingShift = toSignedInteger(nextField);
-    deviceStatus.wingShift = float(currWingShift) * 0.1f;
+    _deviceStatus.wingShift = float(currWingShift) * 0.1f;
 
     // First heaters raw PMW
     nextField = strtok(NULL, " ");
@@ -290,58 +300,46 @@ void QuantumDevice::parseStatusInfo()
 
     // PMW Limit
     nextField = strtok(NULL, " ");
-    deviceStatus.heater1PMWLimit = toInteger(nextField);
-    deviceStatus.heater1PMW = (float(pmw) * 100.0f) / float(deviceStatus.heater1PMWLimit);
+    _deviceStatus.heater1PMWLimit = toInteger(nextField);
+    _deviceStatus.heater1PMW = (float(pmw) * 100.0f) / float(_deviceStatus.heater1PMWLimit);
 
     // Temperature of first heater
     nextField = strtok(NULL, " ");
     int temp = toInteger(nextField);
-    deviceStatus.heater1Temprature = float(temp) * 0.01;
+    _deviceStatus.heater1Temprature = float(temp) * 0.01;
 
     // Temperature of the second heater
-    if(deviceStatus.bDualHeaters) {
+    if(_deviceStatus.bDualHeaters) {
         nextField = strtok(NULL, " ");
         temp = toInteger(nextField);
-        deviceStatus.heater2Temperature = float(temp) * 0.01;
+        _deviceStatus.heater2Temperature = float(temp) * 0.01;
        }
 
     // Input voltage
     nextField = strtok(NULL, " ");
-    deviceStatus.inputVoltage = float(toInteger(nextField)) * 0.01;
+    _deviceStatus.inputVoltage = float(toInteger(nextField)) * 0.01;
 
     // Calibration Pot Position
     nextField = strtok(NULL, " ");
-    deviceStatus.calibrationPotPos = toInteger(nextField);
+    _deviceStatus.calibrationPotPos = toInteger(nextField);
 
     // Second heater duty cycle (if present)
-    if(deviceStatus.bDualHeaters) {
+    if(_deviceStatus.bDualHeaters) {
         // First heaters raw PMW
         nextField = strtok(NULL, " ");
         int pmw = toInteger(nextField);
 
         // PMW Limit
         nextField = strtok(NULL, " ");
-        deviceStatus.heater2PMWLimit = toInteger(nextField);
-        deviceStatus.heater2PMW = (float(pmw) * 100.0f) / float(deviceStatus.heater2PMWLimit);
+        _deviceStatus.heater2PMWLimit = toInteger(nextField);
+        _deviceStatus.heater2PMW = (float(pmw) * 100.0f) / float(_deviceStatus.heater2PMWLimit);
         }
 
-    mutexBlocker.unlock();
-}
-
-void QuantumDevice::parseBootCount()
-{
     mutexBlocker.lock();
-
-    // Boot count is first
-    char *nextField = strtok(szReturnBuffer, " ");
-    deviceStatus.nBootCount = toInteger(nextField);
-
-    // Next runtime in minutes
-    nextField = strtok(NULL, " ");
-    deviceStatus.nRunMinutes = toInteger(nextField);
-
+    memcpy(&deviceStatus, &_deviceStatus, sizeof(QuantumStatus));
     mutexBlocker.unlock();
 }
+
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////
@@ -349,22 +347,20 @@ void QuantumDevice::parseBootCount()
 /// the message queue if it get's backed up.
 void QuantumDevice::updateStatus(void)
 {
+    QString cmd;
+    mutexBlocker.lock();
+    if(!commandQueue.isEmpty())
+        cmd = commandQueue.dequeue();
+    mutexBlocker.unlock();
+
     // Are there any commands in the queue to be run?
-    if(!commandQueue.isEmpty()) {
-        // Process the next command
-        mutexBlocker.lock();
-        QString cmd = commandQueue.dequeue();
-
-        // Parse the command results
-        mutexBlocker.unlock();
-
+    if(!cmd.isEmpty()) {
         // Send the command
         sendCommand(cmd.toUtf8());
 
         // Check return based on command
         // E OK
-        printf("%s\n", szReturnBuffer);
-
+        //printf("%s\n", szReturnBuffer);
         }
 
     // Every cycle, we want the GI (Get Info) to run which contains a lot of useful data

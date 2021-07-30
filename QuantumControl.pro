@@ -8,6 +8,9 @@ CONFIG += c++11
 # In order to do so, uncomment the following line.
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
+# Sorry Microsoft...
+DEFINES += _CRT_SECURE_NO_WARNINGS
+
 SOURCES += \
     dlgabout.cpp \
     main.cpp \
@@ -47,3 +50,4 @@ macx: {
 QMAKE_INFO_PLIST = Resources/Info.plist
 RC_FILE = Resources/QuantumIcon.icns
 }
+

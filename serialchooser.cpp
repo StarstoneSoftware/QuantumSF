@@ -123,7 +123,6 @@ void SerialChooser::attemptOneConnection(void)
     QApplication::setOverrideCursor(Qt::WaitCursor);
     QuantumDevice *pConnect = new QuantumDevice(nullptr, listOfPorts[iItem]);
 
-
     connect(pConnect, SIGNAL(connectedToQuantum(QuantumDevice*)), this, SLOT(gotConnected(QuantumDevice*)), Qt::QueuedConnection);
     connect(pConnect, SIGNAL(couldNotOpen(QuantumDevice*)), this, SLOT(failedConnection(QuantumDevice*)), Qt::QueuedConnection);
     pConnect->start();

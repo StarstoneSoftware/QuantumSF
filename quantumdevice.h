@@ -120,6 +120,7 @@ protected:
     //////////////////////////////////////////////////////////////////
     // These are all shared and must be synchronized.
     QuantumStatus   deviceStatus;
+    QuantumStatus   _deviceStatus;
 
 
     //////////////////////////////////////
@@ -130,7 +131,6 @@ protected:
     int  toInteger(const char* szStringField);
     int  toSignedInteger(const char* szStringField);
     void parseStatusInfo(void);
-    void parseBootCount(void);
 
 
     // Thread starts here
