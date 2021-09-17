@@ -74,7 +74,8 @@ bool QuantumDevice::sendCommand(const char* szCommand)
     int nTries = 0;
     while(nTries++ < 3) {
         pSerialPort->write(szCommand);
-        pSerialPort->flush();
+        // This flush causes a hang and time out on macOS.
+        //pSerialPort->flush();
         if(!pSerialPort->waitForBytesWritten())
             return false; // This is an actual error... no retries
 
@@ -163,6 +164,7 @@ void QuantumDevice::run()
     pSerialPort->setStopBits(QSerialPort::OneStop);
     pSerialPort->setFlowControl(QSerialPort::NoFlowControl);
     pSerialPort->setReadBufferSize(MAX_COMM_BUFFER_SIZE);
+
 
     // Basic serial port opening, doesn't prove anything yet..
     bool bReady = false;

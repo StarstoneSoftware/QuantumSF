@@ -148,18 +148,30 @@ void QuantumGui::updateStatusDisplay(void)
         }
 
     ui->labelErrorCode->setText(output);
+    float fTarget = pQuantumDevice->getWavelengthString().toFloat() + deviceStatus.wingShift;
 
     // On or off band
     if(deviceStatus.bOnBand)
-        output = "On Band";
-    else
-        output = "Not on Band";
+        output = "** On Band **";
+    else {
+        if(deviceStatus.centerWavelength < fTarget)
+            output = "Warming";
+        else
+            output = "Cooling";
+
+        }
+
     ui->labelBandStatus->setText(output);
 
     // Current wavelength
     output = QString::asprintf("Current Center Wavelength: %.1f", deviceStatus.centerWavelength);
     output += angstromSymbol;
     ui->labelWavelength->setText(output);
+
+    // Target wavelength
+    output = QString::asprintf("Target Wavelength: %.1f", fTarget);
+    output += angstromSymbol;
+    ui->labelTarget->setText(output);
 
     // Current wingshift
     output = QString::asprintf("Current Wingshift: %0.1f", deviceStatus.wingShift);
@@ -176,18 +188,12 @@ void QuantumGui::updateStatusDisplay(void)
     output += " F ";
     ui->labelTemp->setText(output);
 
-    // Boots
-    //output = QString::asprintf("Boot Cycles: %d", deviceStatus.nBootCount);
-    //ui->labelBootCount->setText(output);
-
-    // Runtime
-    //output = QString::asprintf("Run Time: %d minutes", deviceStatus.nRunMinutes);
-    //ui->labelRunTime->setText(output);
+    pWavelengthGraph->SetOnBand(deviceStatus.bOnBand);
+    pWavelengthGraph->SetTargetWavelength(fTarget);
     pWavelengthGraph->SetCurrentWavelength(deviceStatus.centerWavelength);
     pWavelengthGraph->SetDesignWavelength(pQuantumDevice->getWavelengthString().toFloat());
     pWavelengthGraph->SetCurrentWingshift(deviceStatus.wingShift);
     pWavelengthGraph->update();
-
     }
 
 

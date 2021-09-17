@@ -36,7 +36,7 @@ SOFTWARE
 #include <QSerialPort>
 
 // Size of the return buffer
-#define MAX_COMM_BUFFER_SIZE    128
+#define MAX_COMM_BUFFER_SIZE    1024
 
 // TIMEOUT value in milliseconds (initially 1 second)
 #define QUANTUM_TIMEOUT 1000

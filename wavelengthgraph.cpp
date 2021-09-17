@@ -40,11 +40,23 @@ void WavelengthGraph::paintEvent(QPaintEvent *event)
 {
     event->accept();
 
+    QBrush redBrush(QColor(198, 32,32, 255));
+    QBrush greenBrush(QColor(32, 198, 32, 255));
+    QBrush blueBrush(QColor(32, 32, 198, 255));
+
     QPainter painter(this);
 
-
     painter.setPen(QPen(QColor(255,255,255,255)));
-    painter.setBrush(QBrush(QColor(255, 0, 0, 255)));
+
+    if(bOnBand)
+        painter.setBrush(greenBrush);
+    else
+        {
+        if(fTargetWavelength < fCurrentWavelength) // Cooling is red because... physics
+            painter.setBrush(redBrush);
+        else
+            painter.setBrush(blueBrush);
+        }
 
     QRect rect = geometry();
     painter.drawRect(rect);
@@ -55,12 +67,13 @@ void WavelengthGraph::paintEvent(QPaintEvent *event)
     int nDivisions = (nWidth - (nMargins * 2)) / 20;
 
     // Draw tick marks
+    int nTickSpace = int((fCurrentWavelength - fDesignWavelength) * -10.0) * nDivisions;
     float fStart = fDesignWavelength - 1.0f;
     for(int i= nMargins+5; i < nWidth; i+= nDivisions) {
-        painter.drawLine(i, 10, i, 30);
+        painter.drawLine(i + nTickSpace, 10, i + nTickSpace, 30);
 
         QTransform t;
-        t.translate(i, 25);
+        t.translate(i + nTickSpace, 25);
         t.rotate(90.0f);
         painter.save();
         painter.setTransform(t);
@@ -72,8 +85,10 @@ void WavelengthGraph::paintEvent(QPaintEvent *event)
     }
 
     painter.drawLine(nWidth / 2, 0, nWidth/2, nHeight-25);
+    painter.drawLine((nWidth / 2)-1, 0, (nWidth/2)-1, nHeight-25);
+    painter.drawLine((nWidth / 2)-2, 0, (nWidth/2)-2, nHeight-25);
 
-    QString out = QString::asprintf("%.1f", fDesignWavelength);
+    QString out = QString::asprintf("Target: %.1f", fTargetWavelength);
     out += angstromSymbol;
 
     // How wide is the above string
@@ -81,7 +96,7 @@ void WavelengthGraph::paintEvent(QPaintEvent *event)
 
     int pixelsWide = fm.horizontalAdvance(out);
     //int pixelsHigh = fm.height();
-    int nBottomMargin = 2;
+    int nBottomMargin = 3;
 
     painter.drawText(nWidth / 2 - pixelsWide / 2, nHeight - nBottomMargin, out);
 

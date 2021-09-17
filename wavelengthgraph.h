@@ -36,14 +36,18 @@ class WavelengthGraph : public QWidget
 public:
     explicit WavelengthGraph(QWidget *parent);
 
-    void SetDesignWavelength(float fCenter)     { fDesignWavelength = fCenter; }
-    void SetCurrentWavelength(float fCurrent)   { fCurrentWavelength = fCurrent; }
-    void SetCurrentWingshift(float fShift)      { fWingshift = fShift; }
+    inline void SetDesignWavelength(float fCenter)     { fDesignWavelength = fCenter; }
+    inline void SetCurrentWavelength(float fCurrent)   { fCurrentWavelength = fCurrent; }
+    inline void SetCurrentWingshift(float fShift)      { fWingshift = fShift; }
+    inline void SetOnBand(bool bStatus)                { bOnBand = bStatus; }
+    inline void SetTargetWavelength(float fTarget)     { fTargetWavelength = fTarget; }
 
 protected:
     float   fDesignWavelength;      // Center wavelength as designed
     float   fCurrentWavelength;     // Current wavelength
     float   fWingshift;             // Current wingshift
+    float   bOnBand;                // Are you on band?
+    float   fTargetWavelength;      // Current target
 
     // Angstrom Symbol
     const unsigned char angstromEncode[4] = { 0xe2, 0x84, 0xab, 0x0 };
