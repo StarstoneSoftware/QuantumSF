@@ -46,8 +46,8 @@ protected:
     float   fDesignWavelength;      // Center wavelength as designed
     float   fCurrentWavelength;     // Current wavelength
     float   fWingshift;             // Current wingshift
-    float   bOnBand;                // Are you on band?
     float   fTargetWavelength;      // Current target
+    bool    bOnBand;                // Are you on band?
 
     // Angstrom Symbol
     const unsigned char angstromEncode[4] = { 0xe2, 0x84, 0xab, 0x0 };

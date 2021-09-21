@@ -149,6 +149,9 @@ void QuantumGui::updateStatusDisplay(void)
 
     ui->labelErrorCode->setText(output);
     float fTarget = pQuantumDevice->getWavelengthString().toFloat() + deviceStatus.wingShift;
+    fTarget *= 10.0f;
+    fTarget = floor(fTarget);
+    fTarget = fTarget * 0.1f;
 
     // On or off band
     if(deviceStatus.bOnBand)

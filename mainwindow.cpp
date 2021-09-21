@@ -56,6 +56,7 @@ void MainWindow::closeEvent(QCloseEvent *event)
             pQuantumDevice->terminate();
 
         delete pQuantumDevice;
+        pQuantumDevice = nullptr;
         }
 
     event->accept();

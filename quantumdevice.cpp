@@ -290,11 +290,13 @@ void QuantumDevice::parseStatusInfo()
     nextField = strtok(NULL, " ");
     int currWavelength = toInteger(nextField);
     _deviceStatus.centerWavelength = float(currWavelength) * 0.1f;
+    printf("Device center wavelength is %d or %.8f\n", currWavelength, _deviceStatus.centerWavelength);
 
     // Wingshift
     nextField = strtok(NULL, " ");
     int currWingShift = toSignedInteger(nextField);
     _deviceStatus.wingShift = float(currWingShift) * 0.1f;
+    printf("Wing shift from device is %d or %.8f\n", currWingShift, _deviceStatus.wingShift);
 
     // First heaters raw PMW
     nextField = strtok(NULL, " ");

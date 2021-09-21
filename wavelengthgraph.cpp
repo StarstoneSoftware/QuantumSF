@@ -52,7 +52,8 @@ void WavelengthGraph::paintEvent(QPaintEvent *event)
         painter.setBrush(greenBrush);
     else
         {
-        if(fTargetWavelength < fCurrentWavelength) // Cooling is red because... physics
+        if(fTargetWavelength > fCurrentWavelength) // Backwards physics, but matches buttons
+                                                   // on the Quantum
             painter.setBrush(redBrush);
         else
             painter.setBrush(blueBrush);
@@ -67,6 +68,7 @@ void WavelengthGraph::paintEvent(QPaintEvent *event)
     int nDivisions = (nWidth - (nMargins * 2)) / 20;
 
     // Draw tick marks
+//    float fTarget = (onBand) ? fTargetWavelength : fCurrentWavelength;
     int nTickSpace = int((fCurrentWavelength - fDesignWavelength) * -10.0) * nDivisions;
     float fStart = fDesignWavelength - 1.0f;
     for(int i= nMargins+5; i < nWidth; i+= nDivisions) {
