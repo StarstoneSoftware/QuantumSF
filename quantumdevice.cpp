@@ -116,6 +116,9 @@ bool QuantumDevice::sendCommand(const char* szCommand)
 // After that it is hexidecmial.
 int QuantumDevice::toInteger(const char* szStringField)
 {
+    if(szStringField == NULL)
+        return 0;
+        
     // It's just ascii decimal
     if(bOldFirmware)
         return atoi(szStringField);
@@ -130,6 +133,9 @@ int QuantumDevice::toInteger(const char* szStringField)
 // Convert a string to a decimal. Hex value is 2's complement
 int QuantumDevice::toSignedInteger(const char* szStringField)
 {
+    if(szStringField == NULL)
+        return 0;
+        
     // It's just ascii decimal
     if(bOldFirmware)
         return atoi(szStringField);
@@ -290,13 +296,11 @@ void QuantumDevice::parseStatusInfo()
     nextField = strtok(NULL, " ");
     int currWavelength = toInteger(nextField);
     _deviceStatus.centerWavelength = float(currWavelength) * 0.1f;
-    printf("Device center wavelength is %d or %.8f\n", currWavelength, _deviceStatus.centerWavelength);
 
     // Wingshift
     nextField = strtok(NULL, " ");
     int currWingShift = toSignedInteger(nextField);
     _deviceStatus.wingShift = float(currWingShift) * 0.1f;
-    printf("Wing shift from device is %d or %.8f\n", currWingShift, _deviceStatus.wingShift);
 
     // First heaters raw PMW
     nextField = strtok(NULL, " ");
@@ -370,9 +374,11 @@ void QuantumDevice::updateStatus(void)
     // Every cycle, we want the GI (Get Info) to run which contains a lot of useful data
     if(sendCommand(qCmdGetInfo))
         parseStatusInfo();
-    else
+    else {
         emit fatalError(-1);
-
+        return;
+        }
+        
     emit statusUpdated();
 
     // Do this again in a second...

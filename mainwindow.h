@@ -66,6 +66,7 @@ private:
 
 public Q_SLOTS:
     void quantumHasConnected(QuantumDevice *pDevice);
+    void quantumHasDropped(int nErrorCode);
 
 };
 #endif // MAINWINDOW_H

@@ -27,6 +27,7 @@ SOFTWARE
 #include <QPainter>
 #include <QPen>
 #include <QColor>
+#include <QFont>
 #include <QFontMetrics>
 
 
@@ -46,8 +47,13 @@ void WavelengthGraph::paintEvent(QPaintEvent *event)
 
     QPainter painter(this);
 
-    painter.setPen(QPen(QColor(255,255,255,255)));
-
+    painter.setPen(QPen(QColor(198,198,198,255)));
+    
+    QFont fontGraph("Helvetica", 16);
+    QFont fontGraphBold("Helvetica", 18, QFont::Black);
+    
+    painter.setFont(fontGraph);
+    
     if(bOnBand)
         painter.setBrush(greenBrush);
     else
@@ -81,11 +87,23 @@ void WavelengthGraph::paintEvent(QPaintEvent *event)
         painter.setTransform(t);
         QString out = QString::asprintf("%.1f", fStart);
         out += angstromSymbol;
-        painter.drawText(0, -2, out);
+        
+        if(fabs(fStart - fTargetWavelength) < 0.01) {
+            painter.setPen(QPen(QColor(255,255,255,255)));
+            painter.setFont(fontGraphBold);            
+            painter.drawText(-5, -2, out);
+            painter.setFont(fontGraph);
+            painter.setPen(QPen(QColor(198,198,198,255)));
+
+            }
+        else 
+            painter.drawText(-5, -2, out);
+        
         fStart += 0.1f;
         painter.restore();
     }
 
+    painter.setPen(QPen(QColor(255,255,255,255)));
     painter.drawLine(nWidth / 2, 0, nWidth/2, nHeight-25);
     painter.drawLine((nWidth / 2)-1, 0, (nWidth/2)-1, nHeight-25);
     painter.drawLine((nWidth / 2)-2, 0, (nWidth/2)-2, nHeight-25);
@@ -96,11 +114,11 @@ void WavelengthGraph::paintEvent(QPaintEvent *event)
     // How wide is the above string
     QFontMetrics fm(font());
 
-    int pixelsWide = fm.horizontalAdvance(out);
+    //int pixelsWide = fm.horizontalAdvance(out);
     //int pixelsHigh = fm.height();
-    int nBottomMargin = 3;
+    //int nBottomMargin = 3;
 
-    painter.drawText(nWidth / 2 - pixelsWide / 2, nHeight - nBottomMargin, out);
+    //painter.drawText(nWidth / 2 - pixelsWide / 2, nHeight - nBottomMargin, out);
 
 
 

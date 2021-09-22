@@ -24,6 +24,7 @@ SOFTWARE
 */
 
 #include <QCloseEvent>
+#include <QMessageBox>
 
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
@@ -62,6 +63,25 @@ void MainWindow::closeEvent(QCloseEvent *event)
     event->accept();
 }
 
+void MainWindow::quantumHasDropped(int nErrorCode)
+{
+    (void)nErrorCode; // For future use
+    pQuantumDevice->exit();
+    QDeadlineTimer deadline(5000); // 5 seconds
+    
+    QMessageBox::critical(this, tr("Quantum Solar Filter"), tr("The connection has been lost to the Quantum Solar Filter and this program will now close."),
+        QMessageBox::Ok);
+     
+    if(!pQuantumDevice->wait(deadline))
+        pQuantumDevice->terminate();
+
+    delete pQuantumDevice;
+    pQuantumDevice = nullptr;
+
+    close();
+}
+
+
 //////////////////////////////////////////////////////////////////////
 // We have a connetion! Get rid of the serial chooser and put up the
 // main quantum gui
@@ -69,6 +89,8 @@ void MainWindow::quantumHasConnected(QuantumDevice *pDevice)
 {
     // Hang on to this.
     pQuantumDevice = pDevice;
+    
+    connect(pQuantumDevice, SIGNAL(fatalError(int)), this, SLOT(quantumHasDropped(int)), Qt::QueuedConnection);
 
     // Serial chooser is no longer needed and in the way
     pSerialChooser->close();
