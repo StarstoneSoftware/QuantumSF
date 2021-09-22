@@ -23,7 +23,7 @@
    </size>
   </property>
   <property name="windowTitle">
-   <string>Quantum Filter Control Center</string>
+   <string>Quantum Solar Filter Control Center</string>
   </property>
   <widget class="QWidget" name="centralwidget"/>
   <widget class="QMenuBar" name="menubar">
@@ -32,7 +32,7 @@
      <x>0</x>
      <y>0</y>
      <width>770</width>
-     <height>24</height>
+     <height>25</height>
     </rect>
    </property>
   </widget>

@@ -29,6 +29,7 @@ This class draws the wavelength graph.
 
 #include <QWidget>
 #include <QPaintEvent>
+#include <math.h>
 
 class WavelengthGraph : public QWidget
 {

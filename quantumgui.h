@@ -34,6 +34,7 @@ SOFTWARE
 
 #include <QDialog>
 #include <QResizeEvent>
+#include <math.h>
 
 
 namespace Ui {

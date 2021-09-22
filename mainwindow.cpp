@@ -52,8 +52,7 @@ void MainWindow::closeEvent(QCloseEvent *event)
 {
     if(pQuantumDevice) {
         pQuantumDevice->exit();
-        QDeadlineTimer deadline(500);
-        if(!pQuantumDevice->wait(deadline))
+        if(!pQuantumDevice->wait(500))
             pQuantumDevice->terminate();
 
         delete pQuantumDevice;
@@ -67,12 +66,11 @@ void MainWindow::quantumHasDropped(int nErrorCode)
 {
     (void)nErrorCode; // For future use
     pQuantumDevice->exit();
-    QDeadlineTimer deadline(5000); // 5 seconds
     
     QMessageBox::critical(this, tr("Quantum Solar Filter"), tr("The connection has been lost to the Quantum Solar Filter and this program will now close."),
         QMessageBox::Ok);
      
-    if(!pQuantumDevice->wait(deadline))
+    if(!pQuantumDevice->wait(500))
         pQuantumDevice->terminate();
 
     delete pQuantumDevice;

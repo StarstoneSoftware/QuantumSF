@@ -3,6 +3,7 @@ QT       += core gui serialport
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 CONFIG += c++11
+CONFIG += debug_and_release
 
 # You can make your code fail to compile if it uses deprecated APIs.
 # In order to do so, uncomment the following line.
@@ -10,6 +11,9 @@ CONFIG += c++11
 
 # Sorry Microsoft...
 DEFINES += _CRT_SECURE_NO_WARNINGS
+
+linux-g++:			QMAKE_LFLAGS += -no-pie
+
 
 SOURCES += \
     dlgabout.cpp \
