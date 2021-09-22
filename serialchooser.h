@@ -34,6 +34,7 @@ SOFTWARE
 #include <QDialog>
 #include <QSerialPortInfo>
 #include <QSerialPort>
+#include <QTreeWidgetItem>
 
 #include "quantumdevice.h"
 
@@ -59,6 +60,7 @@ public Q_SLOTS:
     void itemSelected(void);
     void refreshPortList(void);
     void attemptOneConnection(void);
+    void itemDoubleClicked(QTreeWidgetItem *item, int column);
 
     void gotConnected(QuantumDevice* pDevice);
     void failedConnection(QuantumDevice* pDevice);

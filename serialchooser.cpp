@@ -23,7 +23,6 @@ SOFTWARE
 */
 
 #include <QTreeWidget>
-#include <QTreeWidgetItem>
 #include <QStringList>
 #include <QMessageBox>
 
@@ -42,6 +41,7 @@ SerialChooser::SerialChooser(QWidget *parent) :
 
     connect(ui->pushButtonAbout, SIGNAL(pressed()), this, SLOT(pressedAbout()));
     connect(ui->treeWidget, SIGNAL(itemSelectionChanged()), this, SLOT(itemSelected()));
+    connect(ui->treeWidget, SIGNAL(itemDoubleClicked(QTreeWidgetItem*, int)), this, SLOT(itemDoubleClicked(QTreeWidgetItem*, int)));
     connect(ui->pushButtonRefresh, SIGNAL(pressed()), this, SLOT(refreshPortList()));
     connect(ui->pushButtonUseSelected, SIGNAL(pressed()), this, SLOT(attemptOneConnection()));
 
@@ -128,6 +128,12 @@ void SerialChooser::attemptOneConnection(void)
     pConnect->start();
 
 }
+
+void SerialChooser::itemDoubleClicked(QTreeWidgetItem *item, int column)
+{
+    attemptOneConnection();
+}
+
 
 ///////////////////////////////////////////////////////////////////////
 // We got a connection! Pass the info on to the parent window,
