@@ -130,7 +130,9 @@ void SerialChooser::attemptOneConnection(void)
 }
 
 void SerialChooser::itemDoubleClicked(QTreeWidgetItem *item, int column)
-{
+{ 
+    (void)item;
+    (void)column;
     attemptOneConnection();
 }
 

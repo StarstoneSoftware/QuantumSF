@@ -50,3 +50,11 @@ compile_commands.json
 
 # QtCreator local machine specific files for imported projects
 *creator.user*
+
+# Xcode generated artifacts
+.xcode
+Debug/
+Release/
+DerivedData/
+QuantumControl.xcodeproj/
+QuantumControl/Images.xcassets
